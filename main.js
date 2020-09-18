@@ -17,9 +17,9 @@ import Point from 'ol/geom/point';
 import Style from 'ol/style/style';
 import IconStyle from 'ol/style/icon';
 
-
-
-
+//! [import-popup]
+import Overlay from 'ol/overlay';
+import coordinate from 'ol/coordinate';
 
 //! [map-const]
 const map = new Map({
@@ -58,4 +58,24 @@ navigator.geolocation.getCurrentPosition(function(pos) {
   //! [add-point]
   position.addFeature(new Feature(new Point(coords)));
   //! [add-point]
+});
+
+//! [overlay]
+var overlay = new Overlay({
+  element: document.getElementById('popup-container'),
+  positioning: 'bottom-center',
+  offset: [0, -10]
+});
+map.addOverlay(overlay);
+
+//! [listen]
+map.on('click', function(e) {
+  overlay.setPosition();
+  var features = map.getFeaturesAtPixel(e.pixel);
+  if (features) {
+    var coords = features[0].getGeometry().getCoordinates();
+    var hdms = coordinate.toStringHDMS(proj.toLonLat(coords));
+    overlay.getElement().innerHTML = hdms;
+    overlay.setPosition(coords);
+  }
 });
